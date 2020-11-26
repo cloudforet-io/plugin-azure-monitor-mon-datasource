@@ -1,2 +1,3 @@
 # plugin-azure-monitor
-Plugin for Azure monitor
+Plugin for MS Azure Monitor
+
