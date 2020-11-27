@@ -53,9 +53,10 @@ class AzureManager(BaseManager):
             period = self._make_period_from_time_range(start, end)
 
         stat = self._convert_stat(stat)
+        resource_id = self._get_resource_id(resource)
 
         self.azure_connector.set_connect(schema, options, secret_data)
-        return self.azure_connector.get_metric_data(resource, metric, start, end, period, stat)
+        return self.azure_connector.get_metric_data(resource_id, metric, start, end, period, stat)
 
     @staticmethod
     def _convert_stat(stat):
@@ -92,3 +93,7 @@ class AzureManager(BaseManager):
             return 'PT12H'
         else:                            # 4w ~
             return 'PT24H'
+
+    @staticmethod
+    def _get_resource_id(resource):
+        return resource.get('resource_id')

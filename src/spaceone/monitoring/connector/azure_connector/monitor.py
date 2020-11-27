@@ -16,9 +16,9 @@ class Monitor(object):
     def list_metrics(self, resource_id):
         return [metric for metric in self.client.metric_definitions.list(resource_id)]
 
-    def get_metric_data(self, resource, metric, start, end, period, stat):
+    def get_metric_data(self, resource_id, metric, start, end, period, stat):
         metrics_data = self.client.metrics.list(
-            resource,
+            resource_id,
             timespan=f'{start}/{end}',
             interval=period,
             metricnames=metric,
