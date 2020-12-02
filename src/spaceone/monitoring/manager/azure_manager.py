@@ -8,7 +8,7 @@ from spaceone.monitoring.connector.azure_connector import AzureConnector
 _LOGGER = logging.getLogger(__name__)
 
 _STAT_MAP = {
-    'AVERAGE': 'Average',
+    'MEAN': 'Average',
     'MAX': 'Maximum',
     'MIN': 'Minimum',
     'SUM': 'Total'
@@ -61,7 +61,7 @@ class AzureManager(BaseManager):
     @staticmethod
     def _convert_stat(stat):
         if stat is None:
-            stat = 'AVERAGE'
+            stat = 'MEAN'
 
         if stat not in _STAT_MAP.keys():
             raise ERROR_NOT_SUPPORT_STAT(supported_stat=' | '.join(_STAT_MAP.keys()))
