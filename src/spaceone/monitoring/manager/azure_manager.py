@@ -34,7 +34,7 @@ class AzureManager(BaseManager):
 
         self.azure_connector.set_connect(schema, options, secret_data)
 
-        for metric in self.azure_connector.list_metrics(resource):
+        for metric in self.azure_connector.list_metrics(self._get_resource_id(resource)):
             metrics_info.append({
                 'key': metric.name.value,
                 'name': metric.name.value,
