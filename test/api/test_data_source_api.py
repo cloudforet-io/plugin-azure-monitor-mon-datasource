@@ -16,8 +16,8 @@ from test.factory.data_source_factory import PluginVerifyResponseFactory
 
 class _MockDataSourceService(BaseService):
 
-    def verify(self, params):
-        yield PluginVerifyResponseFactory()
+    def init(self, params):
+        return PluginVerifyResponseFactory()
 
 
 class TestDataSourceAPI(unittest.TestCase):
@@ -34,17 +34,16 @@ class TestDataSourceAPI(unittest.TestCase):
     @patch.object(BaseAPI, '__init__', return_value=None)
     @patch.object(Locator, 'get_service', return_value=_MockDataSourceService())
     @patch.object(BaseAPI, 'parse_request')
-    def test_verify_data_source(self, mock_parse_request, *args):
+    def test_init_data_source(self, mock_parse_request, *args):
         params = {}
         mock_parse_request.return_value = (params, {})
 
         data_source_servicer = DataSource()
-        responses = data_source_servicer.verify({}, {})
+        responses = data_source_servicer.init({}, {})
 
         for response in responses:
             print_message(response, 'test_verify_data_source')
-            self.assertIsInstance(response, data_source_pb2.PluginVerifyResponse)
-
+            self.assertIsInstance(response, data_source_pb2.PluginInfo)
 
 if __name__ == "__main__":
     unittest.main(testRunner=RichTestRunner)

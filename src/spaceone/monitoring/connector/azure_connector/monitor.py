@@ -14,7 +14,19 @@ class Monitor(object):
         self.client = client
 
     def list_metrics(self, resource_id):
-        return [metric for metric in self.client.metric_definitions.list(resource_id)]
+        print("LIST METRICS...")
+        print(f'===> resource_id : {resource_id}')
+
+        results = []
+        for metric in self.client.metric_definitions.list(resource_id):
+            print("---------------")
+            print(metric)
+            print("---------------")
+
+            results.append(metric)
+
+        return results
+        # return [metric for metric in self.client.metric_definitions.list(resource_id)]
 
     def get_metric_data(self, resource_id, metric, start, end, period, stat):
         metrics_data = self.client.metrics.list(
