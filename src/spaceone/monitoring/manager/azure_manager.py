@@ -49,8 +49,15 @@ class AzureManager(BaseManager):
         return {'metrics': metrics_info}
 
     def get_metric_data(self, schema, options, secret_data, resource, metric, start, end, period, stat):
+        print("*******")
+        print(type(start))
+
         if period is None:
             period = self._make_period_from_time_range(start, end)
+
+        print(type(start))
+        print(str(start))
+        print("*******")
 
         stat = self._convert_stat(stat)
         resource_id = self._get_resource_id(resource)
