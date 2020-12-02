@@ -96,7 +96,7 @@ class TestAzureMonitorConnector(TestCase):
         )
 
         print_data(metrics_info, 'test_list_metrics')
-
+        print(metrics_info)
     def test_all_metric_data(self):
         options = {}
         secret_data = self.secret_data

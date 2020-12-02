@@ -17,15 +17,9 @@ class Monitor(object):
         return [metric for metric in self.client.metric_definitions.list(resource_id)]
 
     def get_metric_data(self, resource_id, metric, start, end, period, stat):
-        print("-----------")
-        print(f'[TIMESPAN] = {start}/{end}')
-        print("{}/{}".format(start, end))
-        print(f'[INTERVAL] = {period}')
-        print("-----------")
-
         metrics_data = self.client.metrics.list(
             resource_id,
-            timespan=f'{start}/{end}',
+            timespan=f'{start.strftime("%Y-%m-%dT%H:%M:%S")}/{end.strftime("%Y-%m-%dT%H:%M:%S")}',
             interval=period,
             metricnames=metric,
             aggregation=stat
