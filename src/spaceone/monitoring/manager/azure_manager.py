@@ -46,10 +46,6 @@ class AzureManager(BaseManager):
                 'chart_options': {}
             })
 
-        print("-----------")
-        print(metrics_info)
-        print("-----------")
-
         return {'metrics': metrics_info}
 
     def get_metric_data(self, schema, options, secret_data, resource, metric, start, end, period, stat):
