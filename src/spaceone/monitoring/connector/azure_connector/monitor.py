@@ -19,6 +19,7 @@ class Monitor(object):
     def get_metric_data(self, resource_id, metric, start, end, period, stat):
         print("-----------")
         print(f'[TIMESPAN] = {start}/{end}')
+        print("{}/{}".format(start, end))
         print(f'[INTERVAL] = {period}')
         print("-----------")
 
