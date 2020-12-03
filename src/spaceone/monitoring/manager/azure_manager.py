@@ -1,5 +1,7 @@
 import logging
 import time
+import datetime
+from duration import to_iso8601
 
 from spaceone.core.manager import BaseManager
 from spaceone.monitoring.error import *
@@ -49,7 +51,10 @@ class AzureManager(BaseManager):
         return {'metrics': metrics_info}
 
     def get_metric_data(self, schema, options, secret_data, resource, metric, start, end, period, stat):
-        if period is None:
+        if period:
+            period_datetime = datetime.timedelta(seconds=period)
+            period = to_iso8601(period_datetime)
+        else:
             period = self._make_period_from_time_range(start, end)
 
         stat = self._convert_stat(stat)
