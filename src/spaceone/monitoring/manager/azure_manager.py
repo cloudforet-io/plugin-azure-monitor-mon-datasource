@@ -101,4 +101,6 @@ class AzureManager(BaseManager):
 
     @staticmethod
     def _get_resource_id(resource):
-        return resource.get('resource_id')
+        data = resource.get('data', {})
+        azure_monitor = data.get('azure_monitor', {})
+        return azure_monitor.get('resource_id')
