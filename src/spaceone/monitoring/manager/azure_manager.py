@@ -1,5 +1,7 @@
 import logging
 import time
+import datetime
+from duration import to_iso8601
 
 from spaceone.core.manager import BaseManager
 from spaceone.monitoring.error import *
@@ -8,7 +10,7 @@ from spaceone.monitoring.connector.azure_connector import AzureConnector
 _LOGGER = logging.getLogger(__name__)
 
 _STAT_MAP = {
-    'AVERAGE': 'Average',
+    'MEAN': 'Average',
     'MAX': 'Maximum',
     'MIN': 'Minimum',
     'SUM': 'Total'
@@ -34,7 +36,7 @@ class AzureManager(BaseManager):
 
         self.azure_connector.set_connect(schema, options, secret_data)
 
-        for metric in self.azure_connector.list_metrics(resource):
+        for metric in self.azure_connector.list_metrics(self._get_resource_id(resource)):
             metrics_info.append({
                 'key': metric.name.value,
                 'name': metric.name.value,
@@ -49,7 +51,10 @@ class AzureManager(BaseManager):
         return {'metrics': metrics_info}
 
     def get_metric_data(self, schema, options, secret_data, resource, metric, start, end, period, stat):
-        if period is None:
+        if period:
+            period_datetime = datetime.timedelta(seconds=period)
+            period = to_iso8601(period_datetime)
+        else:
             period = self._make_period_from_time_range(start, end)
 
         stat = self._convert_stat(stat)
@@ -61,7 +66,7 @@ class AzureManager(BaseManager):
     @staticmethod
     def _convert_stat(stat):
         if stat is None:
-            stat = 'AVERAGE'
+            stat = 'MEAN'
 
         if stat not in _STAT_MAP.keys():
             raise ERROR_NOT_SUPPORT_STAT(supported_stat=' | '.join(_STAT_MAP.keys()))

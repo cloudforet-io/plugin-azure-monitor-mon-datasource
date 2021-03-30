@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from spaceone.tester import TestCase
 from spaceone.core.unittest.runner import RichTestRunner
 from spaceone.core import config
+from spaceone.core import utils
 from spaceone.core.unittest.result import print_data
 from spaceone.core.transaction import Transaction
 from spaceone.monitoring.connector.azure_connector import AzureConnector
@@ -29,22 +30,23 @@ if AZURE_CREDENTIALS_PATH is None:
 
 
 def _get_credentials():
-    with open(AZURE_CREDENTIALS_PATH) as json_file:
-        json_data = json.load(json_file)
-        return json_data
+    azure_cred = os.environ.get('AZURE_CREDENTIALS')
+    test_config = utils.load_yaml_from_file(azure_cred)
+    return test_config.get('AZURE_CREDENTIALS', {})
 
 
 class TestAzureMonitorConnector(TestCase):
     @classmethod
     def setUpClass(cls):
         config.init_conf(package='spaceone.monitoring')
-        cls.secret_data = _get_credentials() if _get_credentials() is not None else {}
+
+        cls.secret_data = _get_credentials()
         cls.azure_connector = AzureConnector(Transaction(), {})
         cls.client = None
 
         cls.subscription_id = cls.secret_data.get('subscription_id')
-        cls.resource_group = 'cloudone-test'
-        cls.vm_name = 'jhsong'
+        cls.resource_group = 'jhsong-resource-group'
+        cls.vm_name = 'jhsong-monitor-test-vm'
 
         super().setUpClass()
 
@@ -64,6 +66,7 @@ class TestAzureMonitorConnector(TestCase):
 
         resource_id = f'subscriptions/{self.subscription_id}/resourceGroups/{self.resource_group}/providers/Microsoft.Compute/virtualMachines/{self.vm_name}'
         metrics_info = self.azure_connector.list_metrics(resource_id)
+        print(metrics_info)
         print_data(metrics_info, 'test_list_metrics')
 
     def test_get_metric_data(self):
@@ -93,7 +96,7 @@ class TestAzureMonitorConnector(TestCase):
         )
 
         print_data(metrics_info, 'test_list_metrics')
-
+        print(metrics_info)
     def test_all_metric_data(self):
         options = {}
         secret_data = self.secret_data

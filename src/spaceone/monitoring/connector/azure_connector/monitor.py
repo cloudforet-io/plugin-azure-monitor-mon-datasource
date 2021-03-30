@@ -19,7 +19,7 @@ class Monitor(object):
     def get_metric_data(self, resource_id, metric, start, end, period, stat):
         metrics_data = self.client.metrics.list(
             resource_id,
-            timespan=f'{start}/{end}',
+            timespan=f'{start.strftime("%Y-%m-%dT%H:%M:%S")}/{end.strftime("%Y-%m-%dT%H:%M:%S")}',
             interval=period,
             metricnames=metric,
             aggregation=stat
