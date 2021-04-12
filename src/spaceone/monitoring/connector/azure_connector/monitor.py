@@ -1,6 +1,7 @@
 import logging
 import time
 from pprint import pprint
+from spaceone.core import utils
 from datetime import datetime, timezone
 from spaceone.monitoring.error import *
 
@@ -41,8 +42,7 @@ class Monitor(object):
 
     @staticmethod
     def _convert_timestamp(metric_datetime):
-        timestamp = int(time.mktime(metric_datetime.timetuple()))
-        return {'seconds': timestamp}
+        return utils.datetime_to_iso8601(metric_datetime)
 
     @staticmethod
     def _get_metric_data(metric_value):
