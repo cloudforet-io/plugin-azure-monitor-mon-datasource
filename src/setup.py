@@ -37,6 +37,7 @@ setup(
         'adal',
         'msrestazure',
         'azure-identity',
+        'duration',
         'azure-mgmt-monitor==1.0.0b1'
     ],
     zip_safe=False,

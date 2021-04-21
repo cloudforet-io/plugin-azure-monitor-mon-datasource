@@ -36,7 +36,7 @@ class AzureManager(BaseManager):
 
         self.azure_connector.set_connect(schema, options, secret_data)
 
-        for metric in self.azure_connector.list_metrics(self._get_resource_id(resource)):
+        for metric in self.azure_connector.list_metrics(self._get_list_resource_id(resource)):
             metrics_info.append({
                 'key': metric.name.value,
                 'name': metric.name.value,
@@ -58,10 +58,27 @@ class AzureManager(BaseManager):
             period = self._make_period_from_time_range(start, end)
 
         stat = self._convert_stat(stat)
-        resource_id = self._get_resource_id(resource)
-
         self.azure_connector.set_connect(schema, options, secret_data)
-        return self.azure_connector.get_metric_data(resource_id, metric, start, end, period, stat)
+
+        get_data_set = {
+            'labels': [],
+            'resource_values': {}
+        }
+
+        resources = resource.get('resources', [])
+
+        for single_resource in resources:
+
+            sp_resource_id = single_resource.get('sp_resource_id')
+            resource_id = self._get_resource_id(single_resource)
+            single_response = self.azure_connector.get_metric_data(resource_id, metric, start, end, period, stat)
+
+            if not get_data_set.get('labels') and len(single_response.get('labels', [])) > 0:
+                get_data_set['labels'] = single_response.get('labels', [])
+
+            get_data_set['resource_values'].update({sp_resource_id: single_response.get('values')})
+
+        return get_data_set
 
     @staticmethod
     def _convert_stat(stat):
@@ -100,7 +117,14 @@ class AzureManager(BaseManager):
             return 'PT24H'
 
     @staticmethod
-    def _get_resource_id(resource):
+    def _get_list_resource_id(resource):
         data = resource.get('data', {})
         azure_monitor = data.get('azure_monitor', {})
         return azure_monitor.get('resource_id')
+
+    @staticmethod
+    def _get_resource_id(resource):
+        # data = resource.get('data', {})
+        # azure_monitor = data.get('azure_monitor', {})
+        # return azure_monitor.get('resource_id')
+        return resource.get('resource_id')
