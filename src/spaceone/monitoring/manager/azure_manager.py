@@ -31,12 +31,12 @@ class AzureManager(BaseManager):
     def set_connector(self, schema, secret_data):
         self.azure_connector.set_connect(schema, {}, secret_data)
 
-    def list_metrics(self, schema, options, secret_data, resource):
+    def list_metrics(self, schema, options, secret_data, query):
         metrics_info = []
 
         self.azure_connector.set_connect(schema, options, secret_data)
 
-        for metric in self.azure_connector.list_metrics(self._get_list_resource_id(resource)):
+        for metric in self.azure_connector.list_metrics(query.get('resource_id')):
             metrics_info.append({
                 'key': metric.name.value,
                 'name': metric.name.value,
@@ -44,13 +44,14 @@ class AzureManager(BaseManager):
                     'x': 'Timestamp',
                     'y': metric.unit
                 },
-                'chart_type': 'line',
-                'chart_options': {}
+                'metric_query': {
+                    'resource_id': query.get('resource_id')
+                }
             })
 
         return {'metrics': metrics_info}
 
-    def get_metric_data(self, schema, options, secret_data, resource, metric, start, end, period, stat):
+    def get_metric_data(self, schema, options, secret_data, metric_query, metric, start, end, period, stat):
         if period:
             period_datetime = datetime.timedelta(seconds=period)
             period = to_iso8601(period_datetime)
@@ -62,21 +63,18 @@ class AzureManager(BaseManager):
 
         get_data_set = {
             'labels': [],
-            'resource_values': {}
+            'values': {}
         }
 
-        resources = resource.get('resources', [])
+        for cloud_service_id, _metric in metric_query.items():
+            resource_id = _metric.get('resource_id')
+            response = self.azure_connector.get_metric_data(cloud_service_id, resource_id,
+                                                            metric, start, end, period, stat)
 
-        for single_resource in resources:
+            if not get_data_set.get('labels') and len(response.get('labels', [])) > 0:
+                get_data_set['labels'] = response.get('labels', [])
 
-            sp_resource_id = single_resource.get('sp_resource_id')
-            resource_id = self._get_resource_id(single_resource)
-            single_response = self.azure_connector.get_metric_data(resource_id, metric, start, end, period, stat)
-
-            if not get_data_set.get('labels') and len(single_response.get('labels', [])) > 0:
-                get_data_set['labels'] = single_response.get('labels', [])
-
-            get_data_set['resource_values'].update({sp_resource_id: single_response.get('values')})
+            get_data_set['values'].update(response.get('values'))
 
         return get_data_set
 
@@ -115,16 +113,3 @@ class AzureManager(BaseManager):
             return 'PT12H'
         else:                            # 4w ~
             return 'PT24H'
-
-    @staticmethod
-    def _get_list_resource_id(resource):
-        data = resource.get('data', {})
-        azure_monitor = data.get('azure_monitor', {})
-        return azure_monitor.get('resource_id')
-
-    @staticmethod
-    def _get_resource_id(resource):
-        # data = resource.get('data', {})
-        # azure_monitor = data.get('azure_monitor', {})
-        # return azure_monitor.get('resource_id')
-        return resource.get('resource_id')

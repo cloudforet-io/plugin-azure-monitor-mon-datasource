@@ -17,7 +17,7 @@ class Monitor(object):
     def list_metrics(self, resource_id):
         return [metric for metric in self.client.metric_definitions.list(resource_id)]
 
-    def get_metric_data(self, resource_id, metric, start, end, period, stat):
+    def get_metric_data(self, cloud_service_id, resource_id, metric, start, end, period, stat):
         metrics_data = self.client.metrics.list(
             resource_id,
             timespan=f'{start.strftime("%Y-%m-%dT%H:%M:%S")}/{end.strftime("%Y-%m-%dT%H:%M:%S")}',
@@ -27,13 +27,13 @@ class Monitor(object):
         )
 
         labels = []
-        values = []
+        values = {}
 
         for item in metrics_data.value:
             for timeserie in item.timeseries:
                 for data in timeserie.data:
                     labels.append(self._convert_timestamp(data.time_stamp))
-                    values.append(self._get_metric_data(getattr(data, stat.lower(), None)))
+                    values.update({cloud_service_id: self._get_metric_data(getattr(data, stat.lower(), None))})
 
         return {
             'labels': labels,
