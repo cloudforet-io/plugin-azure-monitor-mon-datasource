@@ -37,17 +37,21 @@ class AzureManager(BaseManager):
         self.azure_connector.set_connect(schema, options, secret_data)
 
         for metric in self.azure_connector.list_metrics(query.get('resource_id')):
-            metrics_info.append({
+            _metric = {
                 'key': metric.name.value,
                 'name': metric.name.value,
-                'unit': {
-                    'x': 'Timestamp',
-                    'y': metric.unit
-                },
                 'metric_query': {
                     'resource_id': query.get('resource_id')
                 }
-            })
+            }
+
+            if getattr(metric, 'unit', None):
+                _metric.update({'unit': {'x': 'Timestamp', 'y': metric.unit}})
+
+            if getattr(metric, 'namespace', None):
+                _metric.update({'group': metric.namespace})
+
+            metrics_info.append(_metric)
 
         return {'metrics': metrics_info}
 
