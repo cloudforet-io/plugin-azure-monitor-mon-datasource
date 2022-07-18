@@ -27,17 +27,17 @@ class Monitor(object):
         )
 
         labels = []
-        values = {}
+        value_list = []
 
         for item in metrics_data.value:
             for timeserie in item.timeseries:
                 for data in timeserie.data:
                     labels.append(self._convert_timestamp(data.time_stamp))
-                    values.update({cloud_service_id: self._get_metric_data(getattr(data, stat.lower(), None))})
+                    value_list.append(self._get_metric_data(getattr(data, stat.lower(), None)))
 
         return {
             'labels': labels,
-            'values': values
+            'values': {cloud_service_id: value_list}
         }
 
     @staticmethod
