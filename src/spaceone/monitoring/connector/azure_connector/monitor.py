@@ -15,30 +15,40 @@ class Monitor(object):
         self.client = client
 
     def list_metrics(self, resource_id):
-        return [metric for metric in self.client.metric_definitions.list(resource_id)]
+        try:
+            return [metric for metric in self.client.metric_definitions.list(resource_id)]
+        except Exception as e:
+            return []
 
     def get_metric_data(self, cloud_service_id, resource_id, metric, start, end, period, stat):
-        metrics_data = self.client.metrics.list(
-            resource_id,
-            timespan=f'{start.strftime("%Y-%m-%dT%H:%M:%S")}/{end.strftime("%Y-%m-%dT%H:%M:%S")}',
-            interval=period,
-            metricnames=metric,
-            aggregation=stat
-        )
+        try:
+            metrics_data = self.client.metrics.list(
+                resource_id,
+                timespan=f'{start.strftime("%Y-%m-%dT%H:%M:%S")}/{end.strftime("%Y-%m-%dT%H:%M:%S")}',
+                interval=period,
+                metricnames=metric,
+                aggregation=stat
+            )
 
-        labels = []
-        value_list = []
+            labels = []
+            value_list = []
 
-        for item in metrics_data.value:
-            for timeserie in item.timeseries:
-                for data in timeserie.data:
-                    labels.append(self._convert_timestamp(data.time_stamp))
-                    value_list.append(self._get_metric_data(getattr(data, stat.lower(), None)))
+            for item in metrics_data.value:
+                for timeserie in item.timeseries:
+                    for data in timeserie.data:
+                        labels.append(self._convert_timestamp(data.time_stamp))
+                        value_list.append(self._get_metric_data(getattr(data, stat.lower(), None)))
 
-        return {
-            'labels': labels,
-            'values': {cloud_service_id: value_list}
-        }
+            return {
+                'labels': labels,
+                'values': {cloud_service_id: value_list}
+            }
+
+        except Exception as e:
+            return {
+                'labels': [],
+                'values': {}
+            }
 
     @staticmethod
     def _convert_timestamp(metric_datetime):
