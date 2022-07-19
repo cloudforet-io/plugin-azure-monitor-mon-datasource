@@ -1,4 +1,4 @@
-from schematics.models import Model
+from schematics import Model
 from schematics.types import ListType, StringType
 from schematics.types.compound import ModelType
 
