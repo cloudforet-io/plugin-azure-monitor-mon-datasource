@@ -18,6 +18,7 @@ class Monitor(object):
         try:
             return [metric for metric in self.client.metric_definitions.list(resource_id)]
         except Exception as e:
+            _LOGGER.error(f"[list_metrics]: {e}")
             return []
 
     def get_metric_data(self, cloud_service_id, resource_id, metric, start, end, period, stat):
@@ -45,6 +46,8 @@ class Monitor(object):
             }
 
         except Exception as e:
+            _LOGGER.error(f"[get_metric_data]: {e}")
+
             return {
                 'labels': [],
                 'values': {}
