@@ -8,14 +8,13 @@ from spaceone.monitoring.error import *
 from spaceone.core.connector import BaseConnector
 from spaceone.monitoring.connector.azure_connector.monitor import Monitor
 
-
 __all__ = ['AzureConnector']
 _LOGGER = logging.getLogger(__name__)
 
 
 class AzureConnector(BaseConnector):
-    def __init__(self, transaction=None, config=None):
-        super().__init__(transaction, config)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.monitor_client = None
 
     def set_connect(self, schema, options: dict, secret_data: dict):
