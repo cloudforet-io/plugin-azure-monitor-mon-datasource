@@ -16,29 +16,28 @@
 
 from setuptools import setup, find_packages
 
-with open('VERSION', 'r') as f: 
+with open("VERSION", "r") as f:
     VERSION = f.read().strip()
     f.close()
 
 setup(
-    name='plugin-azure-monitor',
+    name="plugin-azure-monitor",
     version=VERSION,
-    description='MS Azure Monitor plugin',
-    long_description='',
-    url='https://www.spaceone.dev/',
-    author='MEGAZONE SpaceONE Team',
-    author_email='admin@spaceone.dev',
-    license='Apache License 2.0',
+    description="MS Azure Monitor plugin",
+    long_description="",
+    url="https://www.spaceone.dev/",
+    author="MEGAZONE SpaceONE Team",
+    author_email="admin@spaceone.dev",
+    license="Apache License 2.0",
     packages=find_packages(),
     install_requires=[
-        'spaceone-core',
-        'spaceone-api',
-        'schematics',
-        'adal',
-        'msrestazure',
-        'azure-identity',
-        'duration',
-        'azure-mgmt-monitor==1.0.0b1'
+        "spaceone-api",
+        "schematics",
+        "adal",
+        "msrestazure",
+        "azure-identity",
+        "duration",
+        "azure-mgmt-monitor==1.0.0b1",
     ],
     zip_safe=False,
 )
